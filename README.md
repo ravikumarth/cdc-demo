@@ -41,7 +41,7 @@ oc exec $(oc get pods -n earth -l 'deployment=server' -o jsonpath='{.items[0].me
 oc new-project moon
 
 oc apply -f moon-data-sql.yml -n moon
-oc new-app postgresql:12 -e 'POSTGRESQL_USER=user1' -e 'POSTGRESQL_PASSWORD=Abcd1234!' -e 'POSTGRESQL_ADMIN_PASSWORD=Abcd1234!' -e 'POSTGRESQL_DATABASE=sampledb' -n moon
+oc new-app postgresql:12 -e 'POSTGRESQL_USER=user1' -e 'POSTGRESQL_PASSWORD=Abcd1234!' -e 'POSTGRESQL_ADMIN_PASSWORD=Abcd1234!' -e 'POSTGRESQL_DATABASE=sampledb' -n moon # postgesql version 10 didn't work for me
 oc set volume deployment/postgresql --add --name=moon-data --claim-size 10G --mount-path=/var/lib/pgsql/data -n moon
 oc set volume deployment/postgresql --add --name=moon-data-sql --type=configmap --mount-path=/opt/workshop --configmap-name=moon-data-sql -n moon
 
