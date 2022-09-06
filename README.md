@@ -12,6 +12,26 @@ oc new-app mcr.microsoft.com/mssql/server:2017-CU9-ubuntu -e 'ACCEPT_EULA=Y' -e 
 oc set volume deployment/server --add --name=earth-data --claim-size 10G --mount-path=/var/opt/mssql -n earth
 oc set volume deployment/server --add --name=earth-data-sql --type=configmap --mount-path=/opt/workshop --configmap-name=earth-data-sql -n earth
 
+
+
+oc exec $(oc get pods -n earth -l 'deployment=server' -o jsonpath='{.items[0].metadata.name}') -n earth -- /opt/mssql-tools/bin/sqlcmd -S server.earth.svc -U sa -P 'Password!' -i /opt/workshop/earth-data.sql
+
+```
+
+## if CDC is not enabled, run these commands to enable CDC
+
+```
+/opt/mssql-tools/bin/sqlcmd -S server.earth.svc -U sa -P Password! -d InternationalDB -Q "select @@SERVERNAME"
+
+/opt/mssql-tools/bin/sqlcmd -S server.earth.svc -U sa -P Password! -d InternationalDB -Q "select SERVERPROPERTY('ServerName')"
+
+
+/opt/mssql-tools/bin/sqlcmd -S server.earth.svc -U sa -P Password! -d InternationalDB -Q "exec sp_dropserver '<old servername>'"
+  
+/opt/mssql-tools/bin/sqlcmd -S server.earth.svc -U sa -P Password! -d InternationalDB -Q "exec sp_addserver '<new servername>', 'local'"
+
+/opt/mssql-tools/bin/sqlcmd -S server.earth.svc -U sa -P Password! -d InternationalDB -Q "exec sp_helpserver"
+
 oc exec $(oc get pods -n earth -l 'deployment=server' -o jsonpath='{.items[0].metadata.name}') -n earth -- /opt/mssql-tools/bin/sqlcmd -S server.earth.svc -U sa -P 'Password!' -i /opt/workshop/earth-data.sql
 ```
 
@@ -21,7 +41,7 @@ oc exec $(oc get pods -n earth -l 'deployment=server' -o jsonpath='{.items[0].me
 oc new-project moon
 
 oc apply -f moon-data-sql.yml -n moon
-oc new-app postgresql:10 -e 'POSTGRESQL_USER=user1' -e 'POSTGRESQL_PASSWORD=Abcd1234!' -e 'POSTGRESQL_ADMIN_PASSWORD=Abcd1234!' -e 'POSTGRESQL_DATABASE=sampledb' -n moon
+oc new-app postgresql:latest -e 'POSTGRESQL_USER=user1' -e 'POSTGRESQL_PASSWORD=Abcd1234!' -e 'POSTGRESQL_ADMIN_PASSWORD=Abcd1234!' -e 'POSTGRESQL_DATABASE=sampledb' -n moon
 oc set volume deployment/postgresql --add --name=moon-data --claim-size 10G --mount-path=/var/lib/pgsql/data -n moon
 oc set volume deployment/postgresql --add --name=moon-data-sql --type=configmap --mount-path=/opt/workshop --configmap-name=moon-data-sql -n moon
 
