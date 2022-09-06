@@ -99,7 +99,7 @@ go
 ## Check the PostgreSQL DB
 
 ```
-oc run -n moon postgresql-client -ti --image=registry.redhat.io/rhel8/postgresql-10 --rm=true --restart=Never -- /usr/bin/env PGPASSWORD='Abcd1234!' psql -dsampledb -hpostgresql.moon.svc -Uuser1
+oc run -n moon postgresql-client -ti --image=registry.redhat.io/rhel8/postgresql-12 --rm=true --restart=Never -- /usr/bin/env PGPASSWORD='Abcd1234!' psql -dsampledb -hpostgresql.moon.svc -Uuser1
 ```
 
 ```
